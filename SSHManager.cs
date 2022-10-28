@@ -1,41 +1,54 @@
-﻿using Renci.SshNet;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Configuration;
+using System.Diagnostics;
 
 namespace YSGM
 {
     public class SSHManager
     {
-        public SshClient client;
+        string host;
+        string user;
+        string exePath;
         public static SSHManager Instance = new();
 
         private SSHManager()
         {
 #if DEBUG
-            string? host = "hk4e-storage.mihoyo.com";
-            string? user = "root";
-            string? keyPath = @"C:\Users\Paris\.ssh\id_rsa";
+            host = "hk4e-storage.mihoyo.com";
+            user = ConfigurationManager.AppSettings.Get("SSH_USER")!;
 #else
-            string? host = ConfigurationManager.AppSettings.Get("SSH_HOST");
-            string? user = ConfigurationManager.AppSettings.Get("SSH_USER");
-            string? keyPath = ConfigurationManager.AppSettings.Get("SSH_KEY_PATH");
+            string? host = ConfigurationManager.AppSettings.Get("SSH_HOST")!;
+            string? user = ConfigurationManager.AppSettings.Get("SSH_USER")!;
 #endif
-            // Read the private key file
-            PrivateKeyFile keyFile = new(keyPath);
-            var keyFiles = new[] { keyFile };
-            PrivateKeyAuthenticationMethod authMethod = new(user, keyFiles);
-            ConnectionInfo connectionInfo = new (host, user, authMethod);
+            // I can't use SSH.NET...
+            // FINE. I'll just make a child process
 
-            client = new SshClient(connectionInfo);
+            var enviromentPath = Environment.GetEnvironmentVariable("PATH");
+            if (enviromentPath == null) throw new Exception("PATH is null");
+
+            var paths = enviromentPath.Split(';');
+            exePath = paths.Select(x => Path.Combine(x, "ssh.exe"))
+                               .Where(x => File.Exists(x))
+                               .FirstOrDefault()!;
+            
+            if (string.IsNullOrWhiteSpace(exePath) == true) throw new Exception("SSH not found");
         }
 
-        public void Init()
+        public string Execute(string cmd)
         {
-            client.Connect();
+            Process p = new Process();
+            p.StartInfo.WorkingDirectory = Path.GetDirectoryName(exePath);
+            p.StartInfo.FileName = exePath;
+            p.StartInfo.Arguments = $"{user}@{host} -o LogLevel=error -q /bin/bash";
+            p.StartInfo.RedirectStandardInput = true;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.RedirectStandardError = true;
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.CreateNoWindow = true;
+            p.Start();
+            p.StandardInput.Write(cmd);
+            p.StandardInput.Flush();
+            p.StandardInput.Close();
+            return p.StandardOutput.ReadToEnd();
         }
     }
 }
