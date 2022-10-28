@@ -48,7 +48,16 @@ namespace YSGM
             p.StandardInput.Write(cmd);
             p.StandardInput.Flush();
             p.StandardInput.Close();
-            return p.StandardOutput.ReadToEnd();
+            var output = "";
+            while (p.StandardOutput.EndOfStream == false)
+            {
+                string? line = p.StandardOutput.ReadLine();
+                if (line == null) break;
+                output += line;
+                Console.WriteLine($"[SSH] {line}");
+            }
+            
+            return output!;
         }
     }
 }

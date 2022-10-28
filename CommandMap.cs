@@ -8,8 +8,9 @@ namespace YSGM
 
         public static void RegisterAll()
         {
-            handlers.Add("shell", new ShellCommand());
+            handlers.Add("shell", new ShellCommand()); // SSH shell
             
+            // Exit app
             handlers.Add("exit", new ExitCommand());
             handlers.Add("quit", new ExitCommand());
         }
