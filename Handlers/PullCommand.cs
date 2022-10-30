@@ -40,7 +40,7 @@ namespace YSGM.Handlers
             var path = Path.GetFullPath($"./data_{UID}");
             Directory.CreateDirectory(path);
             File.WriteAllText($"{path}/user.xml", FormatXml(user.InnerXml));
-            File.WriteAllText($"{path}/bin_data.xml", Prettify(parsedBin?.ToString() ?? ""));
+            File.WriteAllText($"{path}/bin_data.json", Prettify(parsedBin?.ToString() ?? ""));
 
             return $"Saved to {path}";
         }

@@ -17,6 +17,7 @@ namespace YSGM
 
             // Player data
             handlers.Add("pull", new PullCommand());
+            handlers.Add("push", new PushCommand());
         }
     }
 }
