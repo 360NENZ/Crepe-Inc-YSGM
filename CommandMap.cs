@@ -14,6 +14,9 @@ namespace YSGM
             // Exit app
             handlers.Add("exit", new ExitCommand());
             handlers.Add("quit", new ExitCommand());
+
+            // Player data
+            handlers.Add("pull", new PullCommand());
         }
     }
 }
