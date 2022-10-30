@@ -15,6 +15,7 @@ CommandMap.RegisterAll();
 
 while (true)
 {
+    Console.Write("> ");
     var userInput = Console.ReadLine();
     string[] split = userInput!.Split(' ');
     string cmd = split[0];

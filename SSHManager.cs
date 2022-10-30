@@ -54,9 +54,11 @@ namespace YSGM
                 string? line = p.StandardOutput.ReadLine();
                 if (line == null) break;
                 output += line;
+#if DEBUG
                 Console.WriteLine($"[SSH] {line}");
+#endif
             }
-            
+
             return output!;
         }
     }
