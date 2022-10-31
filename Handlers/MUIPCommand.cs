@@ -6,12 +6,18 @@
         {
             if (args.Length < 2)
             {
-                return "Usage: muip <uid> <command> [msg]";
+                return "Usage: muip <cmd_id> [key=value,key2=value2]";
             }
-            string uid = args[0];
-            int cmd = Convert.ToInt32(args[1]);
-            string msg = string.Join(" ", args.Skip(2));
-            return MUIPManager.Instance.GET(uid, cmd, msg);
+            int cmd = Convert.ToInt32(args[0]);
+            string msg = string.Join(" ", args.Skip(1));
+            // Parse into dictionary
+            Dictionary<string, string> param = new();
+            foreach (string pair in msg.Split(','))
+            {
+                string[] split = pair.Split('=');
+                param.Add(split[0], split[1]);
+            }
+            return MUIPManager.Instance.GET(cmd, param);
         }
     }
 }
