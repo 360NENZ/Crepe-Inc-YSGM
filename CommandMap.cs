@@ -10,6 +10,8 @@ namespace YSGM
         {
             handlers.Add("shell", new ShellCommand()); // SSH shell
             handlers.Add("sql", new SQLCommand()); // SQL query
+            handlers.Add("gm", new GMCommand()); // GM command
+            handlers.Add("muip", new MUIPCommand()); // raw MUIP query
 
             // Exit app
             handlers.Add("exit", new ExitCommand());
