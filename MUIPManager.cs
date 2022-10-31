@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,6 +48,7 @@ namespace YSGM
             }
             query["cmd"] = cmd.ToString();
             query["region"] = ConfigurationManager.AppSettings.Get("MUIP_TARGET_REGION");
+            query["ticket"] = $"YSGM@{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
             query["sign"] = SHA($"{query.ToString()}1d8z98SAKF98bdf878skswa8kdjfy1m9dses");
             builder.Query = query.ToString();
 
