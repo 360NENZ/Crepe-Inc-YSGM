@@ -22,7 +22,7 @@ namespace YSGM
             return GET(1116, new Dictionary<string, string>()
             {
                 { "uid", uid },
-                { "cmd", cmd }
+                { "msg", cmd }
             });
         }
 
@@ -45,6 +45,7 @@ namespace YSGM
             foreach(KeyValuePair<string, string> entry in param) {
                 query[entry.Key] = entry.Value;
             }
+            query["cmd"] = cmd.ToString();
             query["region"] = ConfigurationManager.AppSettings.Get("MUIP_TARGET_REGION");
             query["sign"] = SHA($"{query.ToString()}1d8z98SAKF98bdf878skswa8kdjfy1m9dses");
             builder.Query = query.ToString();
