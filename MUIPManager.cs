@@ -19,15 +19,22 @@ namespace YSGM
 
         public string GM(string uid, string cmd)
         {
-            return GET(uid, 1116, cmd);
+            return GET(1116, new Dictionary<string, string>()
+            {
+                { "uid", uid },
+                { "cmd", cmd }
+            });
         }
 
         public string FetchPlayerBin(string uid)
         {
-            return GET(uid, 1004, "");
+            return GET(1004, new Dictionary<string, string>()
+            {
+                { "uid", uid }
+            });
         }
 
-        public string GET(string uid, int cmd, string? msg) // These both are numbers, but string for convenience
+        public string GET(int cmd, Dictionary<string, string> param) // These both are numbers, but string for convenience
         {
 #if DEBUG
             var builder = new UriBuilder("http://hk4e-storage.mihoyo.com:14311/api");
@@ -35,9 +42,9 @@ namespace YSGM
             var builder = new UriBuilder(ConfigurationManager.AppSettings.Get("MUIP_HOST")!);
 #endif
             var query = HttpUtility.ParseQueryString(builder.Query);
-            query["uid"] = uid;
-            query["cmd"] = cmd.ToString();
-            if (msg != null) query["msg"] = msg;
+            foreach(KeyValuePair<string, string> entry in param) {
+                query[entry.Key] = entry.Value;
+            }
             query["region"] = ConfigurationManager.AppSettings.Get("MUIP_TARGET_REGION");
             query["sign"] = SHA($"{query.ToString()}1d8z98SAKF98bdf878skswa8kdjfy1m9dses");
             builder.Query = query.ToString();
