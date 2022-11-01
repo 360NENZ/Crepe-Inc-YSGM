@@ -47,6 +47,12 @@ Executes a GM command on the specified UID
 {"data":{"msg":"KILL SELF","retmsg":"KILL SELF"},"msg":"succ","retcode":0,"ticket":"YSGM@1667316780"}
 ```
 
+### mail
+Mails a player. Use [this site](https://memetrolls.net/miniprojects/mailparser/) to parse output.
+```
+Usage: mail <output>
+```
+
 ### muip
 Make your own custom MUIP query
 ```
