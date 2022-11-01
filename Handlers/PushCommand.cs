@@ -2,6 +2,7 @@
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using Proto;
 using System.IO.Compression;
+using System.Text;
 using System.Text.Json;
 
 namespace YSGM.Handlers
@@ -17,9 +18,12 @@ namespace YSGM.Handlers
             var compressed = Compress(UID);
             var binData = $"{BitConverter.ToString(compressed.ToArray()).Replace("-", "")}";
             Console.WriteLine(binData);
-            
+
             // Insert to DB
-            SQLManager.Instance.Execute("hk4e_db_user_32live", $"UPDATE t_player_data_{c} SET bin_data=UNHEX('{binData}') WHERE uid = '{UID}'");
+            byte[] ZLIB = Encoding.Default.GetBytes("ZLIB"); // Convert ZLIB to hex
+            var xLIB = BitConverter.ToString(ZLIB);
+            xLIB = xLIB.Replace("-", "");
+            SQLManager.Instance.Execute("hk4e_db_user_32live", $"UPDATE t_player_data_{c} SET bin_data=UNHEX('{xLIB}{binData}') WHERE uid = '{UID}'");
 
             return $"Pushed ${UID} to DB";
         }

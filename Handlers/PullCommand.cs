@@ -1,5 +1,6 @@
 ﻿using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using Proto;
+using System.IO.Compression;
 using System.Text.Json;
 using System.Xml.Linq;
 
@@ -17,24 +18,20 @@ namespace YSGM.Handlers
             var user = SQLManager.Instance.Execute("hk4e_db_user_32live", $"SELECT * FROM t_player_data_{c} WHERE uid = '{UID}'");
 
             var binDataStr = user.SelectSingleNode("row/field[@name='bin_data']")?.InnerText;
-            var binData = FromHex(binDataStr?.Remove(0, 10) ?? ""); // Remove 0xZLIB
-            byte[] decompressed = new byte[999999];
-            var inf = new InflaterInputStream(new MemoryStream(binData));
+            
+            // Parse data
 
-            int bytesRead = 0;
-            while (bytesRead < binData.Length)
+            var binData = FromHex(binDataStr?.Remove(0, 10) ?? ""); // Remove 0xZLIB
+
+            byte[] decompressed;
+            using (var zlib = new ZLibStream(new MemoryStream(binData), CompressionMode.Decompress))
             {
-                int readBytes = inf.Read(decompressed, bytesRead, 999999 - bytesRead);
-                if (readBytes == 0)
-                {
-                    break;
-                }
-                bytesRead += readBytes;
+                var ms = new MemoryStream();
+                zlib.CopyTo(ms);
+                decompressed = ms.ToArray();
             }
 
-            var trimHex = BitConverter.ToString(decompressed).Replace("-", "").TrimEnd('0'); // God forgive me for this abomination
-
-            var parsedBin = parseProtoBin(trimHex);
+            var parsedBin = PlayerDataBin.Parser.ParseFrom(decompressed);
 
             // Create folder and save
             var path = Path.GetFullPath($"./data_{UID}");
@@ -43,21 +40,6 @@ namespace YSGM.Handlers
             File.WriteAllText($"{path}/bin_data.json", Prettify(parsedBin?.ToString() ?? ""));
 
             return $"Saved to {path}";
-        }
-
-        private PlayerDataBin? parseProtoBin(string dataHex, int trailingZeroes = 0)
-        {
-            try
-            {
-                for (int i = 0; i < trailingZeroes; i++)
-                {
-                    dataHex += "0";
-                }
-                return PlayerDataBin.Parser.ParseFrom(FromHex(dataHex));
-            } catch
-            {
-                return parseProtoBin(dataHex, trailingZeroes + 1);
-            }
         }
 
         private string FormatXml(string xml)
