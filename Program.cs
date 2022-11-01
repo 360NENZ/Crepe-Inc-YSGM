@@ -1,4 +1,5 @@
-﻿using YSGM;
+﻿using System.Configuration;
+using YSGM;
 
 Console.WriteLine(@"
 ██╗   ██╗███████╗ ██████╗ ███╗   ███╗

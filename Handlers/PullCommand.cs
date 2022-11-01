@@ -1,5 +1,4 @@
-﻿using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using Proto;
+﻿using Proto;
 using System.IO.Compression;
 using System.Text.Json;
 using System.Xml.Linq;

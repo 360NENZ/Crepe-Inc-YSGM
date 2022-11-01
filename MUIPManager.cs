@@ -54,7 +54,12 @@ namespace YSGM
 
             var client = new HttpClient();
 
-            var webRequest = new HttpRequestMessage(HttpMethod.Get, builder.ToString());
+            string url = builder.ToString();
+            url = url.Replace("%2c", ",");
+            url = url.Replace("%3d", "=");
+            url = url.Replace("%3a", ":");
+
+            var webRequest = new HttpRequestMessage(HttpMethod.Get, url);
 
             var response = client.Send(webRequest);
 
